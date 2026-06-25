@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfadvance1"
+		},
+		"Datalake_accountKey": {
+			"value": ""
+		},
+		"LSdatabase_password": {
+			"value": ""
+		},
+		"Datalake_properties_typeProperties_url": {
+			"value": "https://adfadvancestorageaccount.dfs.core.windows.net/"
+		},
+		"LSdatabase_properties_typeProperties_server": {
+			"value": "pavanlogin.database.windows.net"
+		},
+		"LSdatabase_properties_typeProperties_database": {
+			"value": "adfadvance"
+		},
+		"LSdatabase_properties_typeProperties_userName": {
+			"value": "pavan"
+		},
+		"RestService_properties_typeProperties_url": {
+			"value": "https://pokeapi.co/api/v2/pokemon"
+		}
+	}
+}
