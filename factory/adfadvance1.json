@@ -1,0 +1,15 @@
+{
+	"name": "adfadvance1",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "762b22f2-b8a7-4a57-b433-5a346d894b49",
+		"tenantId": "5f75dd78-215b-4c9d-a0f4-80b258bcbb4d"
+	}
+}

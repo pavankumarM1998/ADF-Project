@@ -1,0 +1,45 @@
+{
+	"name": "Dynamic_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Datalake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_Container": {
+				"type": "string"
+			},
+			"P_Folder": {
+				"type": "string"
+			},
+			"P_File": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().P_File",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_Folder",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().P_Container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

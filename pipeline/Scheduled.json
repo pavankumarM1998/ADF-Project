@@ -1,0 +1,85 @@
+{
+	"name": "Scheduled",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Ingestion",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Schema": {
+							"value": "@pipeline().parameters.Schema",
+							"type": "Expression"
+						},
+						"Table": {
+							"value": "@pipeline().parameters.Table",
+							"type": "Expression"
+						},
+						"Backdate": {
+							"value": "@pipeline().parameters.Backdate",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Alert",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": {
+						"value": "https://prod-22.northcentralus.logic.azure.com:443/workflows/26cda16bc56d47538109d9fd838f83ab/triggers/When_an_HTTP_request_is_received/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2FWhen_an_HTTP_request_is_received%2Frun&sv=1.0&sig=CpIehlC9Xomzl4ZnaHOZ_3eg0sazGlKxrmTNtkuepM0",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "{\n    \"Pipeline_Name\":\"@{pipeline().Pipeline}\"\n    \"Pipeline_ID\":\"@{pipeline().RunId}\"\n}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"Schema": {
+				"type": "string",
+				"defaultValue": "Source"
+			},
+			"Table": {
+				"type": "string",
+				"defaultValue": "Orders"
+			},
+			"Backdate": {
+				"type": "string",
+				"defaultValue": "2025-09-24"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-06-23T04:28:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
