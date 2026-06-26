@@ -146,6 +146,60 @@ Fetches and paginates REST API JSON data to a storage sink.
         `RANGE: 0 : @{activity('Web1').output.COUNT}:20`
         Writes the concatenated output to a single JSON store file (`pokimon.JSON`) in ADLS Gen2.
 
+## 📊 Key Dynamic Expressions & Formulas
+
+To enable dynamic runtime operations, the pipelines utilize several ADF and Mapping Data Flow expressions:
+
+### 1. Ingestion Watermark SQL Filter (`Ingestion.json`)
+Filters source tables based on whether a custom backdate is supplied; otherwise, falls back to the logged CDC timestamp:
+```sql
+SELECT count(*) AS Total_Count FROM @{pipeline().parameters.Schema}.@{pipeline().parameters.Table} WHERE last_updated > 
+    '@{-
+        if(empty(pipeline().parameters.Backdate),
+            activity('Latest CDC').output.value[0].cdc_timestamp,
+            pipeline().parameters.Backdate)
+    }'
+```
+
+### 2. Failure Alert JSON Body (`Scheduled.json`)
+Constructs alert payloads dynamically to report run IDs and pipeline names to the Logic App webhook:
+```json
+{
+    "Pipeline_Name": "@{pipeline().Pipeline}",
+    "Pipeline_ID": "@{pipeline().RunId}"
+}
+```
+
+### 3. Switch Router Condition (`Router.json`)
+Extracts the prefix of file names before the extension to direct files to their target folders:
+```json
+@split(item().name, '.')[0]
+```
+
+### 4. Nested Conditional Translator Mapping (`Dynamic mapping with Schema.json`)
+Evaluates the file name to assign the corresponding translation/mapping parameter dynamically:
+```json
+@if(
+    equals(item().name, 'customers.csv'), pipeline().parameters.customers,
+    if(
+        equals(item().name, 'drivers.csv'), pipeline().parameters.drivers,
+        pipeline().parameters.trips
+    )
+)
+```
+
+### 5. API Pagination Rule (`REST API.json`)
+Determines the range offset dynamically based on the total count returned from the initial call:
+```json
+RANGE: 0 : @{activity('Web1').output.COUNT} : 20
+```
+
+### 6. Derived Full Name Expression (`dataflow.json`)
+Concatenates raw names into a single clean string during the Spark transformation:
+```json
+Full_Name = concatWS(" ", first_name, last_name)
+```
+
 ---
 
 ## 📂 Dataset Catalog
